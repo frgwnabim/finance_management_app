@@ -115,3 +115,36 @@ export async function getRecentTransactions(userId: string, limit = 8) {
   });
   return rows.map(toListItem);
 }
+
+const EXPORT_BATCH_SIZE = 1000;
+
+/**
+ * Every transaction matching the filters (all pages, in the chosen sort),
+ * yielded in batches so large exports don't load everything at once.
+ */
+export async function* iterateTransactionsForExport(userId: string, filters: TransactionFilters) {
+  const where = buildWhere(userId, filters);
+  const orderBy = buildOrderBy(filters.sort);
+  let cursor: string | undefined;
+
+  while (true) {
+    const rows = await prisma.transaction.findMany({
+      where,
+      orderBy,
+      take: EXPORT_BATCH_SIZE,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+      select: {
+        id: true,
+        date: true,
+        type: true,
+        amount: true,
+        note: true,
+        category: { select: { name: true } },
+      },
+    });
+    if (rows.length === 0) return;
+    yield rows.map((row) => ({ ...row, date: toDateOnlyString(row.date) }));
+    if (rows.length < EXPORT_BATCH_SIZE) return;
+    cursor = rows[rows.length - 1].id;
+  }
+}
