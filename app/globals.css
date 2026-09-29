@@ -6,11 +6,27 @@
 :root {
   --background: #fafafa;
   --foreground: #18181b;
+
+  /* Chart tokens. Bar colors are validated against the card surface
+     (white / zinc-900) for contrast in each mode. */
+  --chart-bar: #2a78d6;
+  --chart-bar-active: #256abf;
+  --chart-grid: #e4e4e7;
+  --chart-axis: #d4d4d8;
+  --chart-muted: #71717a;
+  --chart-cursor: rgb(24 24 27 / 0.04);
 }
 
 .dark {
   --background: #09090b;
   --foreground: #f4f4f5;
+
+  --chart-bar: #3987e5;
+  --chart-bar-active: #5598e7;
+  --chart-grid: #27272a;
+  --chart-axis: #3f3f46;
+  --chart-muted: #a1a1aa;
+  --chart-cursor: rgb(255 255 255 / 0.05);
 }
 
 @theme inline {

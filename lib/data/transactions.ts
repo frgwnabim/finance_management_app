@@ -3,6 +3,20 @@ import type { Prisma } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PAGE_SIZE, type TransactionFilters } from "@/lib/transaction-filters";
 
+const listItemSelect = {
+  id: true,
+  type: true,
+  amount: true,
+  date: true,
+  note: true,
+  categoryId: true,
+  category: { select: { name: true, color: true, icon: true } },
+} satisfies Prisma.TransactionSelect;
+
+function toListItem(row: Prisma.TransactionGetPayload<{ select: typeof listItemSelect }>) {
+  return { ...row, date: toDateOnlyString(row.date) };
+}
+
 /** Escapes LIKE wildcards so a search for "50%" or "_" matches literally. */
 function escapeLike(value: string) {
   return value.replace(/[\\%_]/g, (char) => `\\${char}`);
@@ -72,22 +86,14 @@ export async function getTransactionsPage(userId: string, filters: TransactionFi
     orderBy: buildOrderBy(filters.sort),
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
-    select: {
-      id: true,
-      type: true,
-      amount: true,
-      date: true,
-      note: true,
-      categoryId: true,
-      category: { select: { name: true, color: true, icon: true } },
-    },
+    select: listItemSelect,
   });
 
   const income = sums.find((sum) => sum.type === "INCOME")?._sum.amount ?? 0;
   const expense = sums.find((sum) => sum.type === "EXPENSE")?._sum.amount ?? 0;
 
   return {
-    transactions: rows.map((row) => ({ ...row, date: toDateOnlyString(row.date) })),
+    transactions: rows.map(toListItem),
     total,
     page,
     pageCount,
@@ -97,3 +103,14 @@ export async function getTransactionsPage(userId: string, filters: TransactionFi
 
 export type TransactionsPage = Awaited<ReturnType<typeof getTransactionsPage>>;
 export type TransactionListItem = TransactionsPage["transactions"][number];
+
+/** The user's latest transactions, newest first. */
+export async function getRecentTransactions(userId: string, limit = 8) {
+  const rows = await prisma.transaction.findMany({
+    where: { userId },
+    orderBy: [{ date: "desc" }, { createdAt: "desc" }, { id: "desc" }],
+    take: limit,
+    select: listItemSelect,
+  });
+  return rows.map(toListItem);
+}

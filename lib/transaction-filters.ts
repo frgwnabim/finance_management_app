@@ -1,3 +1,4 @@
+import { getMonthRange, shiftMonth, toMonthKey } from "@/lib/dates";
 import type { TransactionType } from "@/lib/generated/prisma/client";
 import { MAX_AMOUNT } from "@/lib/validations/transaction";
 
@@ -140,31 +141,21 @@ export function hasAnyFilter(filters: TransactionFilters) {
   return filters.q !== "" || countActiveFilters(filters) > 0;
 }
 
-const pad = (value: number) => String(value).padStart(2, "0");
-
-function monthStart(year: number, monthIndex: number) {
-  const date = new Date(Date.UTC(year, monthIndex, 1));
-  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-01`;
-}
-
-function monthEnd(year: number, monthIndex: number) {
-  const date = new Date(Date.UTC(year, monthIndex + 1, 0));
-  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
-}
-
 /**
  * Date bounds for a preset, relative to `today` ("YYYY-MM-DD", the user's
  * local date). "Last 3 months" is the current month plus the two before it.
  */
 export function getPresetRange(preset: DatePreset, today: string) {
-  const [year, month] = today.split("-").map(Number);
-  const monthIndex = month - 1;
+  const month = toMonthKey(today);
   switch (preset) {
     case "this-month":
-      return { from: monthStart(year, monthIndex), to: monthEnd(year, monthIndex) };
+      return getMonthRange(month);
     case "last-month":
-      return { from: monthStart(year, monthIndex - 1), to: monthEnd(year, monthIndex - 1) };
+      return getMonthRange(shiftMonth(month, -1));
     case "last-3-months":
-      return { from: monthStart(year, monthIndex - 2), to: monthEnd(year, monthIndex) };
+      return {
+        from: getMonthRange(shiftMonth(month, -2)).from,
+        to: getMonthRange(month).to,
+      };
   }
 }
