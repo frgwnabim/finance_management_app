@@ -3,6 +3,7 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
 import { authConfig } from "@/auth.config";
+import { DEMO_EMAIL } from "@/lib/demo";
 import { prisma } from "@/lib/prisma";
 import { loginSchema } from "@/lib/validations/auth";
 
@@ -21,6 +22,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   providers: [
+    // "Try Demo": signs in the shared demo account only, without a password.
+    Credentials({
+      id: "demo",
+      name: "Demo",
+      credentials: {},
+      async authorize() {
+        const user = await prisma.user.findUnique({
+          where: { email: DEMO_EMAIL },
+          select: { id: true, name: true, email: true },
+        });
+        return user;
+      },
+    }),
     Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
