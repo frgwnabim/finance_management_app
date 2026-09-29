@@ -16,12 +16,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Absolute URLs for social images: Vercel's production domain, else local dev.
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
+const description =
+  "Track income and expenses, set monthly budgets, automate recurring bills and see clear analytics. Amounts in Indonesian Rupiah.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Finance Manager",
     template: "%s | Finance Manager",
   },
-  description: "Track your income, expenses and budgets.",
+  description,
+  applicationName: "Finance Manager",
+  openGraph: {
+    type: "website",
+    siteName: "Finance Manager",
+    title: "Finance Manager: track every rupiah",
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Finance Manager: track every rupiah",
+    description,
+  },
 };
 
 export const viewport: Viewport = {

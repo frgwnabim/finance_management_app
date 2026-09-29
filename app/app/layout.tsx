@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+
 import { DemoBanner } from "@/components/demo/demo-banner";
 import { AppHeader } from "@/components/layout/app-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
@@ -8,6 +10,9 @@ import { TransactionDialogProvider } from "@/components/transactions/transaction
 import { getCategoryOptions } from "@/lib/data/categories";
 import { isDemoUser } from "@/lib/demo";
 import { requireUser } from "@/lib/session";
+
+// Signed-in pages are private: keep them out of search results.
+export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 export default async function AppLayout({ children }: LayoutProps<"/app">) {
   // proxy.ts already guards /app; this also gives Server Components the user.

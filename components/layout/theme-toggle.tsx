@@ -34,7 +34,7 @@ export function ThemeToggle() {
             title={label}
             onClick={() => setTheme(value)}
             className={cn(
-              "flex size-8 items-center justify-center rounded-md transition-colors",
+              "flex size-7 items-center justify-center rounded-md transition-colors sm:size-8",
               "focus-visible:outline-2 focus-visible:outline-emerald-500",
               isActive
                 ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-50"

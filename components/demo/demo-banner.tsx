@@ -21,10 +21,11 @@ export function DemoBanner() {
 
   return (
     <div className="border-b border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-900/60 dark:bg-sky-950/40 dark:text-sky-200">
-      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 text-sm md:px-8">
+      <div className="flex items-center justify-between gap-x-4 px-4 py-1.5 text-sm md:px-8">
         <p className="flex items-center gap-2">
           <FlaskConical className="size-4 shrink-0" aria-hidden />
-          <span>
+          <span className="sm:hidden">Demo account. Data resets daily.</span>
+          <span className="hidden sm:inline">
             You&apos;re exploring the demo account. Feel free to change anything: the data resets
             every day.
           </span>

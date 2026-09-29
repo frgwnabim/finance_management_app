@@ -183,7 +183,6 @@ function RecurringRow({
   const [isToggling, startToggle] = useTransition();
   const title = item.note || item.category.name;
   const badge = STATUS_BADGES[item.status];
-  const isIncome = item.type === "INCOME";
 
   function toggleActive() {
     startToggle(async () => {
@@ -208,22 +207,12 @@ function RecurringRow({
               .join(" · ")}
           </p>
         </div>
-        <div className="shrink-0 text-right">
-          <p className={cn("font-semibold whitespace-nowrap tabular-nums", isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400")}>
-            {isIncome ? "+" : "-"}
-            {formatRupiah(item.amount)}
-          </p>
-          <p className="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
-            {item.nextDueDate
-              ? `${item.status === "paused" ? "Would be" : "Next"} ${formatDateOnly(item.nextDueDate, { day: "numeric", month: "short", year: "numeric" })}`
-              : item.endDate
-                ? `Ended ${formatDateOnly(item.endDate, { day: "numeric", month: "short", year: "numeric" })}`
-                : "Ended"}
-          </p>
-        </div>
+        <AmountInfo item={item} className="hidden text-right sm:block" />
       </div>
 
-      <div className="flex items-center justify-end gap-1 sm:pl-2">
+      <div className="flex items-center gap-1 sm:pl-2">
+        {/* On phones the amount sits here, leaving the title room to breathe. */}
+        <AmountInfo item={item} className="mr-auto sm:hidden" />
         {item.status !== "ended" ? (
           <Button
             variant="ghost"
@@ -251,5 +240,30 @@ function RecurringRow({
         </Button>
       </div>
     </li>
+  );
+}
+
+function AmountInfo({ item, className }: { item: RecurringItem; className?: string }) {
+  const isIncome = item.type === "INCOME";
+  const shortDate: Intl.DateTimeFormatOptions = { day: "numeric", month: "short", year: "numeric" };
+  return (
+    <div className={cn("shrink-0", className)}>
+      <p
+        className={cn(
+          "font-semibold whitespace-nowrap tabular-nums",
+          isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400",
+        )}
+      >
+        {isIncome ? "+" : "-"}
+        {formatRupiah(item.amount)}
+      </p>
+      <p className="text-xs whitespace-nowrap text-zinc-500 dark:text-zinc-400">
+        {item.nextDueDate
+          ? `${item.status === "paused" ? "Would be" : "Next"} ${formatDateOnly(item.nextDueDate, shortDate)}`
+          : item.endDate
+            ? `Ended ${formatDateOnly(item.endDate, shortDate)}`
+            : "Ended"}
+      </p>
+    </div>
   );
 }
