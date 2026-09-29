@@ -16,6 +16,8 @@ import Link from "next/link";
 import { TryDemoButton } from "@/components/demo/try-demo-button";
 import { LandingHeader } from "@/components/landing/landing-header";
 import { ScreenshotPlaceholder } from "@/components/landing/screenshot-placeholder";
+import { SetupNotice } from "@/components/landing/setup-notice";
+import { isDatabaseConfigured } from "@/lib/env";
 import { getCurrentUser } from "@/lib/session";
 import { cn } from "@/lib/utils";
 
@@ -78,14 +80,18 @@ const ENGINEERING = [
 ];
 
 export default async function LandingPage() {
-  const user = await getCurrentUser();
+  // Fresh deployment without a database: show setup steps, skip auth.
+  const databaseReady = isDatabaseConfigured();
+  const user = databaseReady ? await getCurrentUser() : null;
   const isSignedIn = user !== null;
 
   return (
     <div className="flex min-h-dvh flex-col bg-white dark:bg-zinc-950">
-      <LandingHeader isSignedIn={isSignedIn} />
+      <LandingHeader isSignedIn={isSignedIn} showAccountLinks={databaseReady} />
 
       <main className="flex-1">
+        {databaseReady ? null : <SetupNotice />}
+
         {/* Hero */}
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-16 pb-20 sm:px-6 lg:grid-cols-2 lg:pt-24">
           <div>
@@ -108,7 +114,7 @@ export default async function LandingPage() {
                   Open dashboard
                   <ArrowRight className="size-4" aria-hidden />
                 </Link>
-              ) : (
+              ) : !databaseReady ? null : (
                 <>
                   <TryDemoButton />
                   <Link
@@ -120,7 +126,7 @@ export default async function LandingPage() {
                 </>
               )}
             </div>
-            {isSignedIn ? null : (
+            {isSignedIn || !databaseReady ? null : (
               <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
                 The demo needs no sign-up and comes with six months of sample data. It resets daily.
               </p>
@@ -194,7 +200,7 @@ export default async function LandingPage() {
         </section>
 
         {/* Closing call to action */}
-        {isSignedIn ? null : (
+        {isSignedIn || !databaseReady ? null : (
           <section className="border-t border-zinc-200 py-16 dark:border-zinc-800">
             <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 text-center sm:px-6">
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">See it with real-looking data</h2>
