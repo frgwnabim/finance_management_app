@@ -10,6 +10,7 @@ const listItemSelect = {
   date: true,
   note: true,
   categoryId: true,
+  recurringId: true,
   category: { select: { name: true, color: true, icon: true } },
 } satisfies Prisma.TransactionSelect;
 

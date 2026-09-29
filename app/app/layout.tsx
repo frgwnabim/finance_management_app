@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/layout/app-header";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Sidebar } from "@/components/layout/sidebar";
+import { RecurringSync } from "@/components/recurring/recurring-sync";
 import { AddTransactionFab } from "@/components/transactions/add-transaction-button";
 import { TransactionDialogProvider } from "@/components/transactions/transaction-dialog-provider";
 import { getCategoryOptions } from "@/lib/data/categories";
@@ -21,6 +22,7 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
           {children}
         </main>
         <AddTransactionFab />
+        <RecurringSync userId={user.id} />
         <BottomNav />
       </div>
     </TransactionDialogProvider>

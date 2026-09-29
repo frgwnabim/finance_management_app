@@ -24,3 +24,4 @@
 - DATABASE_URL (pooled connection, runtime)
 - DIRECT_URL (direct connection, migrations)
 - AUTH_SECRET
+- CRON_SECRET (protects /api/cron/recurring)

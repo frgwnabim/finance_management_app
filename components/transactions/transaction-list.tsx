@@ -4,6 +4,7 @@ import { Pencil, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
 
 import { CategoryIcon } from "@/components/categories/category-icon";
+import { RecurringBadge } from "@/components/transactions/recurring-badge";
 import { useTransactionDialog } from "@/components/transactions/transaction-dialog-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -173,6 +174,7 @@ function TransactionTable({ groups, showDate, onEdit, onDelete }: ViewProps) {
                     <span className="truncate font-medium text-zinc-900 dark:text-zinc-50">
                       {transaction.category.name}
                     </span>
+                    {transaction.recurringId ? <RecurringBadge /> : null}
                   </div>
                 </td>
                 <td className="truncate px-3 py-3 text-zinc-600 dark:text-zinc-400" title={transaction.note ?? undefined}>
@@ -220,8 +222,11 @@ function TransactionCards({ groups, showDate, onEdit, onDelete }: ViewProps) {
                   >
                     <CategoryIcon icon={transaction.category.icon} color={transaction.category.color} />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate font-medium text-zinc-900 dark:text-zinc-50">
-                        {transaction.category.name}
+                      <span className="flex items-center gap-1.5">
+                        <span className="truncate font-medium text-zinc-900 dark:text-zinc-50">
+                          {transaction.category.name}
+                        </span>
+                        {transaction.recurringId ? <RecurringBadge /> : null}
                       </span>
                       {transaction.note || showDate ? (
                         <span className="block truncate text-sm text-zinc-500 dark:text-zinc-400">
