@@ -1,8 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 
+import { getAuthSecret } from "@/lib/env";
+
 // Edge-safe config shared by proxy.ts and auth.ts.
 // Keep Prisma and bcrypt out of this file.
 export const authConfig = {
+  secret: getAuthSecret(),
   pages: {
     signIn: "/login",
   },

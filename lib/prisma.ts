@@ -1,10 +1,11 @@
 import { PrismaNeon } from "@prisma/adapter-neon";
+import { getDatabaseUrl } from "@/lib/env";
 import { PrismaClient } from "@/lib/generated/prisma/client";
 
 function createPrismaClient() {
   // Connects lazily, so importing this module (e.g. during `next build`)
-  // doesn't require DATABASE_URL. A missing value fails on the first query.
-  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+  // doesn't require a database. A missing URL fails on the first query.
+  const adapter = new PrismaNeon({ connectionString: getDatabaseUrl() });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],

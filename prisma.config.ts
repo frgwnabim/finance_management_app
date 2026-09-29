@@ -1,9 +1,11 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-// The Prisma CLI (migrate, studio) uses the direct, non-pooled connection.
-// The app runtime uses DATABASE_URL via the adapter in lib/prisma.ts.
-// Read with process.env (not env()) so `prisma generate` works without it.
+import { getDirectDatabaseUrl } from "./lib/env";
+
+// The Prisma CLI (migrate, seed, studio) uses the direct, non-pooled
+// connection. The app runtime uses the pooled URL via lib/prisma.ts.
+// Resolved lazily (undefined is fine), so `prisma generate` works without it.
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
@@ -11,6 +13,6 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DIRECT_URL,
+    url: getDirectDatabaseUrl(),
   },
 });

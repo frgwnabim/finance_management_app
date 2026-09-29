@@ -111,31 +111,47 @@ Use `.env` rather than `.env.local`: the Prisma CLI only reads `.env`.
 | Variable | Used by | Description |
 | --- | --- | --- |
 | `DATABASE_URL` | App at runtime | Neon **pooled** connection string (host contains `-pooler`) |
-| `DIRECT_URL` | Prisma CLI | Neon **direct** connection string, for migrations and seeding |
-| `AUTH_SECRET` | Auth.js | Secret for signing sessions. Generate with `npx auth secret` |
-| `CRON_SECRET` | Cron routes | Bearer token Vercel Cron sends to `/api/cron/*`. Generate with `openssl rand -hex 32` |
+| `DIRECT_URL` | Prisma CLI | Neon **direct** connection string, for migrations and seeding. Optional: falls back to `DATABASE_URL_UNPOOLED` (set by the Vercel Neon integration), then `DATABASE_URL` |
+| `AUTH_SECRET` | Auth.js | Secret for signing sessions. Generate with `npx auth secret`. Optional: derived from the database URL when missing |
+| `CRON_SECRET` | Cron routes | Bearer token Vercel Cron sends to `/api/cron/*`. Generate with `openssl rand -hex 32`. Optional: cron jobs are rejected without it |
 | `AUTH_TRUST_HOST` | Auth.js (optional) | Set to `true` when running `npm start` outside Vercel (e.g. locally or self-hosted). Not needed on Vercel or in `npm run dev` |
 
 ## Deploying to Vercel with Neon
 
-1. **Create the database.** Create a Neon project and copy two connection strings from the dashboard: the pooled one (for `DATABASE_URL`) and the direct one (for `DIRECT_URL`). Alternatively, install the Neon integration from the Vercel Marketplace, which provisions a database and can create a separate database branch for each preview deployment.
-2. **Import the repository** in Vercel (framework preset: Next.js). Keep the default build settings: Vercel runs the `vercel-build` script, which is `prisma migrate deploy && next build`, so every deploy applies pending migrations before building. `npm install` runs `prisma generate` automatically.
-3. **Set the environment variables** from the table above for Production (and Preview, if previews should work). `DIRECT_URL` must be available at build time, because migrations run during the build.
-4. **Deploy.** The first build creates all tables.
-5. **Seed the demo account (optional).** Run the seed once against production from your machine:
+No environment variables need to be filled in by hand.
 
-   ```bash
-   DATABASE_URL="<pooled url>" DIRECT_URL="<direct url>" npm run db:seed
-   ```
+1. **Import the repository** in Vercel (**Add New → Project**) and click **Deploy**. Keep all build settings at their defaults. The first deploy succeeds without a database, and the site shows a "connect a database" notice.
+2. **Create the database.** In the Vercel project, open **Storage → Create Database → Neon**. Connect it to the project for all environments and keep the default settings. Vercel adds the connection variables (`DATABASE_URL`, `DATABASE_URL_UNPOOLED`) automatically.
+3. **Redeploy.** In **Deployments**, redeploy the latest deployment. The build runs `prisma migrate deploy` and creates all tables. After that the app is live: **Try Demo** creates the demo account on first use, and anyone can sign up.
 
-   You can also skip this: the first click on **Try Demo** creates the demo account, and the daily reset cron recreates it.
-6. **Cron jobs.** `vercel.json` defines two daily jobs, registered automatically on production deployments:
-   - `/api/cron/reset-demo` at 17:00 UTC (00:00 WIB) restores the demo data.
-   - `/api/cron/recurring` at 17:05 UTC (00:05 WIB) generates due recurring transactions for all users.
+Every later push to the production branch redeploys and applies new migrations automatically.
 
-   Both reject requests without `Authorization: Bearer $CRON_SECRET`. You can find them under **Settings → Cron Jobs** in Vercel.
+### How the zero-config setup works
 
-> **Preview deployments:** migrations also run during preview builds. Point previews at a separate Neon branch (the Neon integration does this automatically), or they will migrate your production database.
+- `lib/env.ts` reads the database URLs from our own names (`DATABASE_URL`, `DIRECT_URL`) or from the names the Neon integration sets (`DATABASE_URL_UNPOOLED`, or the older `POSTGRES_URL` / `POSTGRES_URL_NON_POOLING`).
+- The `vercel-build` script (`scripts/migrate-if-configured.ts`) applies migrations when a database is connected and skips them otherwise, so the first deploy never fails.
+- If `AUTH_SECRET` isn't set, the session secret is derived from the database URL. Setting your own `AUTH_SECRET` is still recommended: it lets you rotate the secret on its own, and changing the database password otherwise signs everyone out.
+
+### Optional settings
+
+| Variable | Why you might set it |
+| --- | --- |
+| `AUTH_SECRET` | Your own session secret (recommended). Generate with `npx auth secret`. |
+| `CRON_SECRET` | Turns on the two daily cron jobs in `vercel.json`. Generate with `openssl rand -hex 32`. |
+
+About the cron jobs:
+
+- `/api/cron/reset-demo` runs at 17:00 UTC (00:00 WIB) and restores the demo data.
+- `/api/cron/recurring` runs at 17:05 UTC (00:05 WIB) and generates due recurring transactions for all users.
+- Both reject requests without `Authorization: Bearer $CRON_SECRET`.
+- Without `CRON_SECRET`, the app still works: recurring transactions are generated whenever a user opens the app, and demo visitors can use **Reset demo data**.
+- After adding or changing any variable, redeploy.
+
+### Tips
+
+- In **Settings → Functions**, set the region to match your Neon database (for example Singapore, `sin1`) to keep queries fast.
+- **Preview deployments** also run migrations. The Neon integration gives each preview its own database branch, so your production data is safe.
+- **Seeding manually** is optional, because Try Demo creates the demo account. To run it yourself: `DATABASE_URL="<pooled url>" DIRECT_URL="<direct url>" npm run db:seed`.
 
 ## Project structure
 
