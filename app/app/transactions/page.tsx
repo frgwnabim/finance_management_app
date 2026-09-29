@@ -1,20 +1,23 @@
-import { ArrowLeftRight } from "lucide-react";
 import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/layout/page-header";
-import { EmptyState } from "@/components/ui/empty-state";
+import { TransactionList } from "@/components/transactions/transaction-list";
+import { getRecentTransactions } from "@/lib/data/transactions";
+import { requireUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Transactions" };
 
-export default function TransactionsPage() {
+export default async function TransactionsPage() {
+  const user = await requireUser();
+  const transactions = await getRecentTransactions(user.id);
+
   return (
     <>
-      <PageHeader title="Transactions" description="All your income and expenses." />
-      <EmptyState
-        icon={ArrowLeftRight}
-        title="Transactions coming soon"
-        description="You'll be able to add, edit, search and filter transactions here."
+      <PageHeader
+        title="Transactions"
+        description="Your latest income and expenses. Tap one to edit it."
       />
+      <TransactionList transactions={transactions} />
     </>
   );
 }

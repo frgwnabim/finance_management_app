@@ -1,6 +1,7 @@
 import { LogoutButton } from "@/components/auth/logout-button";
 import { Logo } from "@/components/layout/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { AddTransactionButton } from "@/components/transactions/add-transaction-button";
 
 export function AppHeader() {
   return (
@@ -11,6 +12,8 @@ export function AppHeader() {
           <Logo />
         </div>
         <div className="flex items-center gap-2">
+          {/* On mobile the floating button opens the same dialog. */}
+          <AddTransactionButton className="hidden md:inline-flex" />
           <ThemeToggle />
           {/* On desktop logout lives in the sidebar user card. */}
           <div className="md:hidden">

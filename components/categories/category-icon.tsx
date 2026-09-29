@@ -82,6 +82,7 @@ export const CATEGORY_ICON_COMPONENTS: Record<CategoryIconName, LucideIcon> = {
 };
 
 const sizes = {
+  xs: { box: "size-6", icon: "size-3.5" },
   sm: { box: "size-8", icon: "size-4" },
   md: { box: "size-10", icon: "size-5" },
 } as const;

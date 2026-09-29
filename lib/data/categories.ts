@@ -28,3 +28,14 @@ export async function getCategoriesWithUsage(userId: string) {
 export type CategoryWithUsage = Awaited<
   ReturnType<typeof getCategoriesWithUsage>
 >[number];
+
+/** Minimal category list for pickers (e.g. the transaction form). */
+export async function getCategoryOptions(userId: string) {
+  return prisma.category.findMany({
+    where: { userId },
+    orderBy: [{ name: "asc" }],
+    select: { id: true, name: true, type: true, color: true, icon: true },
+  });
+}
+
+export type CategoryOption = Awaited<ReturnType<typeof getCategoryOptions>>[number];

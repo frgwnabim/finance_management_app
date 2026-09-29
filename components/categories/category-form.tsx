@@ -5,15 +5,16 @@ import { useId, useState, useTransition } from "react";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { ColorPicker } from "@/components/categories/color-picker";
 import { IconPicker } from "@/components/categories/icon-picker";
+import { TRANSACTION_TYPE_OPTIONS } from "@/components/transactions/type-options";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { FormField } from "@/components/ui/form-field";
 import { Label } from "@/components/ui/label";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import { toast } from "@/components/ui/toast";
 import { createCategory, updateCategory } from "@/lib/actions/categories";
 import { TRANSACTION_TYPE_LABELS } from "@/lib/categories";
 import type { TransactionType } from "@/lib/generated/prisma/client";
-import { cn } from "@/lib/utils";
 
 export type CategoryFormValues = {
   id?: string;
@@ -30,8 +31,6 @@ type CategoryFormProps = {
   onDone: () => void;
   onCancel: () => void;
 };
-
-const TYPES: TransactionType[] = ["EXPENSE", "INCOME"];
 
 export function CategoryForm({ initialValues, onDone, onCancel }: CategoryFormProps) {
   const isEdit = Boolean(initialValues.id);
@@ -90,31 +89,12 @@ export function CategoryForm({ initialValues, onDone, onCancel }: CategoryFormPr
       {isEdit ? null : (
         <div className="flex flex-col gap-1.5">
           <Label id={typeLabelId} as="span">Type</Label>
-          <div role="radiogroup" aria-labelledby={typeLabelId} className="grid grid-cols-2 gap-2">
-            {TYPES.map((type) => {
-              const isSelected = values.type === type;
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  onClick={() => update("type", type)}
-                  className={cn(
-                    "h-10 rounded-lg border text-sm font-medium transition-colors",
-                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500",
-                    isSelected
-                      ? type === "INCOME"
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300"
-                        : "border-red-500 bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300"
-                      : "border-zinc-300 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800",
-                  )}
-                >
-                  {TRANSACTION_TYPE_LABELS[type]}
-                </button>
-              );
-            })}
-          </div>
+          <SegmentedControl
+            options={TRANSACTION_TYPE_OPTIONS}
+            value={values.type}
+            onChange={(type) => update("type", type)}
+            aria-labelledby={typeLabelId}
+          />
         </div>
       )}
 

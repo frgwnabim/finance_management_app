@@ -1,9 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import type { ActionResult } from "@/lib/actions/result";
+import { revalidateApp } from "@/lib/actions/revalidate";
 import { Prisma, type TransactionType } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
@@ -18,8 +18,6 @@ import {
 } from "@/lib/validations/category";
 
 type CategoryField = "name" | "type" | "color" | "icon";
-
-const CATEGORIES_PATH = "/app/settings/categories";
 
 const DUPLICATE_NAME: ActionResult<CategoryField> = {
   ok: false,
@@ -79,7 +77,7 @@ export async function createCategory(
     throw error;
   }
 
-  revalidatePath(CATEGORIES_PATH);
+  revalidateApp();
   return { ok: true, message: `Category "${data.name}" created.` };
 }
 
@@ -108,7 +106,7 @@ export async function updateCategory(
     throw error;
   }
 
-  revalidatePath(CATEGORIES_PATH);
+  revalidateApp();
   return { ok: true, message: `Category "${data.name}" updated.` };
 }
 
@@ -178,7 +176,7 @@ export async function deleteCategory(
       return { name: category.name, target, transactionCount, recurringCount };
     });
 
-    revalidatePath(CATEGORIES_PATH);
+    revalidateApp();
     return {
       ok: true,
       message: result.target
