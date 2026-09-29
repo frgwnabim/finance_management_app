@@ -1,11 +1,11 @@
+import type { CategoryColor, CategoryIconName } from "@/lib/categories";
 import type { TransactionType } from "@/lib/generated/prisma/client";
 
 type DefaultCategory = {
   name: string;
   type: TransactionType;
-  color: string;
-  // lucide icon name
-  icon: string;
+  color: CategoryColor;
+  icon: CategoryIconName;
 };
 
 export const DEFAULT_CATEGORIES: DefaultCategory[] = [

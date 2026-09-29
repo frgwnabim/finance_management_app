@@ -1,7 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ComponentProps, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -80,14 +80,23 @@ export function Dialog({
           </Button>
         </div>
         {children ? (
-          <div className="overflow-y-auto px-4 py-2 sm:px-6">{children}</div>
+          <div className="overflow-y-auto px-4 pt-2 pb-4 sm:px-6 sm:pb-6">{children}</div>
         ) : null}
-        {footer ? (
-          <div className="flex flex-col-reverse gap-2 p-4 pt-4 sm:flex-row sm:justify-end sm:p-6 sm:pt-4">
-            {footer}
-          </div>
-        ) : null}
+        {footer ? <DialogFooter className="px-4 pb-4 sm:px-6 sm:pb-6">{footer}</DialogFooter> : null}
       </div>
     </dialog>
+  );
+}
+
+/** Action row for dialogs. Use inside a form in the dialog body when buttons need form state. */
+export function DialogFooter({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col-reverse gap-2 pt-4 sm:flex-row sm:justify-end",
+        className,
+      )}
+      {...props}
+    />
   );
 }
