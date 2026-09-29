@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { prisma } from "@/lib/prisma";
 
 /** All categories of a user with usage counts, for the management page. */
@@ -29,13 +31,16 @@ export type CategoryWithUsage = Awaited<
   ReturnType<typeof getCategoriesWithUsage>
 >[number];
 
-/** Minimal category list for pickers (e.g. the transaction form). */
-export async function getCategoryOptions(userId: string) {
+/**
+ * Minimal category list for pickers (transaction form, filters).
+ * Cached per request so the /app layout and pages share one query.
+ */
+export const getCategoryOptions = cache(async (userId: string) => {
   return prisma.category.findMany({
     where: { userId },
     orderBy: [{ name: "asc" }],
     select: { id: true, name: true, type: true, color: true, icon: true },
   });
-}
+});
 
 export type CategoryOption = Awaited<ReturnType<typeof getCategoryOptions>>[number];
