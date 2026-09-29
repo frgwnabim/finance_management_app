@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { ExportCsvButton } from "@/components/transactions/filters/export-csv-button";
 import { TransactionFilterBar } from "@/components/transactions/filters/transaction-filter-bar";
+import { ImportCsvButton } from "@/components/transactions/import/import-csv-button";
 import { TransactionFiltersProvider } from "@/components/transactions/filters/transaction-filters-provider";
 import { getCategoryOptions } from "@/lib/data/categories";
 import { requireUser } from "@/lib/session";
@@ -16,7 +17,12 @@ export default async function TransactionsLayout({ children }: LayoutProps<"/app
       <PageHeader
         title="Transactions"
         description="Search, filter and manage your transactions."
-        actions={<ExportCsvButton />}
+        actions={
+          <>
+            <ImportCsvButton />
+            <ExportCsvButton />
+          </>
+        }
       />
       <TransactionFilterBar categories={categories} />
       {children}
