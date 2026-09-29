@@ -1,10 +1,11 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/toast";
 import { logoutAction } from "@/lib/actions/auth";
 
 export function LogoutButton() {
@@ -25,8 +26,15 @@ export function LogoutButton() {
   }
 
   return (
-    <Button variant="secondary" onClick={handleLogout} disabled={isPending}>
-      {isPending ? "Logging out..." : "Log out"}
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={handleLogout}
+      isLoading={isPending}
+      aria-label="Log out"
+      title="Log out"
+    >
+      {isPending ? null : <LogOut className="size-5" aria-hidden />}
     </Button>
   );
 }

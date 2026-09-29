@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
-import { toast } from "sonner";
 
+import { toast } from "@/components/ui/toast";
 import type { AuthFormState } from "@/lib/actions/auth";
 
 type AuthAction = (prev: AuthFormState, formData: FormData) => Promise<AuthFormState>;

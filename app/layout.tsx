@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "sonner";
+
+import { Toaster } from "@/components/ui/toaster";
+import { themeScript } from "@/lib/theme";
 
 import "./globals.css";
 
@@ -22,15 +24,28 @@ export const metadata: Metadata = {
   description: "Track your income, expenses and budgets.",
 };
 
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fafafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // The theme script sets the "dark" class before hydration.
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="flex min-h-full flex-col font-sans">
         {children}
-        <Toaster theme="system" position="top-center" richColors closeButton />
+        <Toaster />
       </body>
     </html>
   );

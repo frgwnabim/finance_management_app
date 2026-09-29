@@ -1,4 +1,6 @@
-import { LogoutButton } from "@/components/auth/logout-button";
+import { AppHeader } from "@/components/layout/app-header";
+import { BottomNav } from "@/components/layout/bottom-nav";
+import { Sidebar } from "@/components/layout/sidebar";
 import { requireUser } from "@/lib/session";
 
 export default async function AppLayout({ children }: LayoutProps<"/app">) {
@@ -6,21 +8,14 @@ export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const user = await requireUser();
 
   return (
-    <div className="flex min-h-dvh flex-1 flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4">
-          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-            Finance Manager
-          </span>
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="hidden truncate text-sm text-zinc-600 sm:inline dark:text-zinc-400">
-              {user.name ?? user.email}
-            </span>
-            <LogoutButton />
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
+    <div className="flex min-h-dvh flex-1 flex-col bg-zinc-50 md:pl-64 dark:bg-zinc-950">
+      <Sidebar user={user} />
+      <AppHeader />
+      {/* Bottom padding keeps content clear of the fixed mobile bottom nav. */}
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-[calc(6rem+env(safe-area-inset-bottom))] md:px-8 md:pb-10">
+        {children}
+      </main>
+      <BottomNav />
     </div>
   );
 }
