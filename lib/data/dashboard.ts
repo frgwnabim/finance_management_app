@@ -1,3 +1,4 @@
+import { getBudgetRatio } from "@/lib/budgets";
 import {
   getMonthRange,
   parseDateOnly,
@@ -121,7 +122,7 @@ export async function getBudgetOverview(userId: string, today: string, limit = 3
   const items = budgets
     .map((budget) => {
       const spent = spentByCategory.get(budget.categoryId) ?? 0;
-      return { ...budget, spent, ratio: budget.amount > 0 ? spent / budget.amount : 0 };
+      return { ...budget, spent, ratio: getBudgetRatio(spent, budget.amount) };
     })
     .sort((a, b) => b.ratio - a.ratio)
     .slice(0, limit);
