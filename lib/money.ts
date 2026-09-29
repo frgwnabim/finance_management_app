@@ -18,5 +18,6 @@ const compactFormat = new Intl.NumberFormat("id-ID", {
 
 /** Short form for chart axes: 1500000 -> "Rp 1,5 jt", 250000 -> "Rp 250 rb" */
 export function formatRupiahCompact(value: number) {
-  return `Rp ${compactFormat.format(value)}`;
+  const formatted = `Rp ${compactFormat.format(Math.abs(value))}`;
+  return value < 0 ? `-${formatted}` : formatted;
 }

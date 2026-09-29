@@ -15,6 +15,13 @@
   --chart-axis: #d4d4d8;
   --chart-muted: #71717a;
   --chart-cursor: rgb(24 24 27 / 0.04);
+  --chart-surface: #ffffff;
+
+  /* Categorical series, fixed order, validated all-pairs on the surface.
+     Slot 3 is under 3:1 in light mode, so every chart ships a table view. */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
 }
 
 .dark {
@@ -27,6 +34,11 @@
   --chart-axis: #3f3f46;
   --chart-muted: #a1a1aa;
   --chart-cursor: rgb(255 255 255 / 0.05);
+  --chart-surface: #18181b;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
 }
 
 @theme inline {
